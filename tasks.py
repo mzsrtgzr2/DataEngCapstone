@@ -22,19 +22,34 @@ def download_raw_data(ctx):
     # activity download
     _download_csv_to(
         'https://query.data.world/s/nlzvfwgrwtkdbpmgzrpzwtyns44sjq',
-        currentdir / 'out' / 'activity.csv'
+        currentdir / 'data' / 'activity.csv'
     )
 
     _download_csv_to(
         'https://query.data.world/s/n2fh33k3646tkphijywr3tw5eeppyk',
-        currentdir / 'out' / 'population.csv'
+        currentdir / 'data' / 'population.csv'
     )
 
     _download_csv_to(
         'https://raw.githubusercontent.com/'
         'govex/COVID-19/master/data_tables/vaccine_data/global_data/'
         'time_series_covid19_vaccine_global.csv',
-        currentdir / 'out' / 'vaccinations.csv'
+        currentdir / 'data' / 'vaccinations_global.csv'
+    )
+
+
+    _download_csv_to(
+        'https://raw.githubusercontent.com/'
+        'govex/COVID-19/master/data_tables/vaccine_data/us_data/time_series/'
+        'vaccine_data_us_timeline.csv',
+        currentdir / 'data' / 'vaccinations_usa_doeses.csv'
+    )
+
+    _download_csv_to(
+        'https://raw.githubusercontent.com/'
+        'govex/COVID-19/master/data_tables/vaccine_data/us_data/time_series/'
+        'people_vaccinated_us_timeline.csv',
+        currentdir / 'data' / 'vaccinations_usa_people.csv'
     )
 
 

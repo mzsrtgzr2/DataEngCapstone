@@ -32,7 +32,8 @@ def scaffold_emr_step(
     ]
     """
     run_task_id = f'step-{step_name}-run'
-    with TaskGroup(group_id=f'step-{step_name}', dag=dag) as tg:
+    group_id = f'step-{step_name}'
+    with TaskGroup(group_id=group_id, dag=dag) as tg:
         
         # Add your steps to the EMR cluster
         step_adder = EmrAddStepsOperator(
@@ -50,7 +51,7 @@ def scaffold_emr_step(
             }],
         )
 
-        step_id = f"{{{{ task_instance.xcom_pull(task_ids='{run_task_id}', key='return_value')[0] }}}}"
+        step_id = f"{{{{ task_instance.xcom_pull(task_ids='{group_id}.{run_task_id}', key='return_value')[0] }}}}"
         
         logging.info('checking step %s', step_id)
 

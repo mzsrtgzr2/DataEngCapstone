@@ -15,7 +15,7 @@ I use 3 time series data sources (see details below) and join them based on coun
 - **Storage:** Amazon S3
 - **Running environment:** Amazon EMR
 - **Pipeline:** Apache Airflow
-- **Packages:** pyspark, omegaconf
+- **Packages:** pyspark
 
 I choose Amazon S3 - Amazon EMR combination instead of Amazon Redshift mainly because of these
 terms:
@@ -96,7 +96,8 @@ full dictionary in [link](https://data.world/covid-19-data-resource-hub/covid-19
 
 ### Source 3 - COVID vaccinations
 
-[Github](https://github.com/govex/COVID-19/tree/master/data_tables/vaccine_data/global_data)
+[Github - global](https://github.com/govex/COVID-19/tree/master/data_tables/vaccine_data/global_data)
+[Github - us only](https://github.com/govex/COVID-19/tree/master/data_tables/vaccine_data/us_data/time_series)
 
 This is an hourly ETL aggregating vaccination data from many sources worldwide. 
 
@@ -108,6 +109,42 @@ This is an hourly ETL aggregating vaccination data from many sources worldwide.
 - *People_partially_vaccinated* - "Cumulative number of people who received at least one vaccine dose. When the person receives a prescribed second dose, it is not counted twice"
 - *People_fully_vaccinated* - Cumulative number of people who received all prescribed doses necessary to be considered fully vaccinated
 - *Report_Date_String* - Data reported date
+
+# Data Schema
+
+
+Fact - Continent Activity
+- aggregate activity information per continent
+
+Dim - continent
+- find unique continent on activity table
+
+Dim - data sources
+- find unique data sources on activity table
+
+Dim - countries
+- join from activity table and population table
+country name, iso, continent, geo position
+
+Dim - Vaccination types
+- get from vaccinations usa table the types
+
+Fact - Vaccinations Doeses administrations (by province)
+Fact - Vaccinated people (partially and fully)
+
+
+
+# ETL
+
+In General:
+1. The pipeline uploads data from sources to s3
+2. The pipeline uploads scripts from local machine to s3 for EMR workers to pick it up
+3. The pipeline creates EMR cluster and waits to steady state
+4. The pipeline sends EMR steps, each step is waited to be finished.
+5. The pipeline terminates EMR cluster.
+
+## ETL Transform Steps
+
 
 
 # Project Sources

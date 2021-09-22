@@ -48,10 +48,22 @@ DATA_SOURCES_MAP = {
         'https://query.data.world/s/n2fh33k3646tkphijywr3tw5eeppyk',
         'population.csv'
     ),
-    'vaccinations': (
+    'vaccinations_global': (
         'https://raw.githubusercontent.com/'
         'govex/COVID-19/master/data_tables/vaccine_data/global_data/'
         'time_series_covid19_vaccine_global.csv',
-        'vaccinations.csv'
+        'vaccinations_global.csv'
+    ),
+    'vaccinations_usa_people': (
+        'https://raw.githubusercontent.com/'
+        'govex/COVID-19/master/data_tables/vaccine_data/us_data/time_series/'
+        'vaccine_data_us_timeline.csv',
+        'vaccinations_usa_people.csv'
+    ),
+    'vaccinations_usa_doeses': (
+        'https://raw.githubusercontent.com/'
+        'govex/COVID-19/master/data_tables/vaccine_data/us_data/time_series/'
+        'vaccine_data_us_timeline.csv',
+        'vaccinations_usa_doeses.csv'
     )
 }
