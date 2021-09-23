@@ -70,30 +70,30 @@ dag = DAG(
 
 start_data_pipeline = DummyOperator(task_id="start_data_pipeline", dag=dag)
 
-# check_connectivity_to_s3 = PythonOperator(
-#     task_id="check_connectivity_to_s3",
-#     python_callable=_check_connectivity_to_s3,
-#     dag=dag
-# )
+check_connectivity_to_s3 = PythonOperator(
+    task_id="check_connectivity_to_s3",
+    python_callable=_check_connectivity_to_s3,
+    dag=dag
+)
 
-# upload_scripts_to_s3 = PythonOperator(
-#     dag=dag,
-#     task_id="upload_scripts_to_s3",
-#     python_callable=_local_scripts_to_s3,
-#     op_kwargs={"path": LOCAL_SCRIPTS_PATH, "key_prefix": 'scripts',},
-# )
+upload_scripts_to_s3 = PythonOperator(
+    dag=dag,
+    task_id="upload_scripts_to_s3",
+    python_callable=_local_scripts_to_s3,
+    op_kwargs={"path": LOCAL_SCRIPTS_PATH, "key_prefix": 'scripts',},
+)
 
 
-# upload_data_to_s3 = tuple(
-#     UploadSourceOperator(
-#         dag=dag,
-#         task_id=f'upload-source-{name}',
-#         aws_conn_id=AWS_CONN_ID,
-#         source_url=src_url,
-#         bucket_name=BUCKET_NAME,
-#         key=f'data/{dest_key}',
-#     )
-#     for name, (src_url, dest_key) in DATA_SOURCES_MAP.items())
+upload_data_to_s3 = tuple(
+    UploadSourceOperator(
+        dag=dag,
+        task_id=f'upload-source-{name}',
+        aws_conn_id=AWS_CONN_ID,
+        source_url=src_url,
+        bucket_name=BUCKET_NAME,
+        key=f'data/{dest_key}',
+    )
+    for name, (src_url, dest_key) in DATA_SOURCES_MAP.items())
 
 
 # Create an EMR cluster
@@ -136,7 +136,7 @@ transform_activity = scaffold_emr_step(
         "spark-submit",
         "--deploy-mode",
         "client",
-        f"s3://{BUCKET_NAME}/scripts/"
+        f"s3://{BUCKET_NAME}/scripts/job.py"
     ]
 )
 
@@ -165,8 +165,9 @@ end_data_pipeline = DummyOperator(task_id="end_data_pipeline", dag=dag)
 
 (
 start_data_pipeline >> 
-    # check_connectivity_to_s3 >>
-    # [upload_scripts_to_s3, upload_data_to_s3] >>
+    check_connectivity_to_s3 >>
+    upload_scripts_to_s3 >> 
+    upload_data_to_s3 >>
     create_emr_cluster_safely >>
     load_to_hadoop >> 
     transform_activity >>

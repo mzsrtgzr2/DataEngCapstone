@@ -1,7 +1,7 @@
 
 
 JOB_FLOW_OVERRIDES = {
-    "Name": "Movie review classifier",
+    "Name": "COVID19-OPERATIONS",
     "ReleaseLabel": "emr-5.29.0",
     "Applications": [{"Name": "Hadoop"}, {"Name": "Spark"}],
     "Configurations": [
