@@ -114,10 +114,22 @@ The focus in this dataset is people vaccination status and doses administered.
 
 ## Data Schema
 
+### Why I choose this schema
+This schema is optimized for OLAP queries about geo positions of COVID-19 activity world wide.
+The ETL I created joins the Continent, Population, and Geo positioning from 5 different data sources so the Users of this data can make queries regarding statistics (like mean, std, correlations etc) of covid activity. Also, I join different features from different table on the same time-series index - meaning, the Users of this data can now see how the different features related to each other, visualize the features together in interesting ways etc.
+
+### Schema design
+The Schema is designed as on big Fact table and several smaller dimentions to support it.
+The reason for that is that OLAP doesn't do joins well, so the Fact table holds everything
+needed for big data queries. 
+
+The Fact table index is: Time, and Geo locaiton (continent, country, province). It is optimized for time-series queries - how the COVID19 changes over time, worldwide. 
+
 
 ### Fact - Worldwide Covid19 Activity
 all activity information
 
+```
 schema:
  |-- country: string (nullable = true) - country related to information
  |-- date: string (nullable = true) - date of the information
@@ -134,39 +146,46 @@ schema:
  |-- continent: string (nullable = true) - what continent for the region
  |-- geo_latitude: double (nullable = false) - geo lat
  |-- geo_longitude: double (nullable = false) - geo long
-
+```
 
 ### Dim - continent
-- find unique continent on activity table
+- unique continent and geo position
 
 schema:
-- *continent*
-- *geo_latitude*
-- *geo_longitude*
+```
+ |-- continent_name: string (nullable = true) - name of continent
+ |-- geo_latitude: double (nullable = true) - geo lat
+ |-- geo_longitude: double (nullable = true) - geo long
+ ```
+
 
 ### Dim - data sources
-- find unique data sources on activity table
+unique data sources on activity table
 
 schema:
-- *data_source_name*
+```
+ |-- DATA_SOURCE_NAME: string (nullable = true) - name of data source
+```
 
 ### Dim - countries
-- join from activity table and population table
 country name, iso, continent, geo position
 
-schema:
-- *continent*
-- *country*
-- *province*
-- *geo_latitude*
-- *geo_longitude*
+```
+ |-- continent: string (nullable = true) - name of continent
+ |-- country: string (nullable = true) - name of country
+ |-- province: string (nullable = true) - name of province
+ |-- population: long (nullable = true) - what is the population in the region
+ |-- geo_latitude: double (nullable = true) - lat
+ |-- geo_longitude: double (nullable = true) - long
+```
 
 ### Dim - Vaccination types
 - get from vaccinations usa table the types
 
 schema:
-- *vacc_type*
-
+```
+ |-- Vaccine_Type: string (nullable = true) - name of the vaccination manufactur
+```
 
 ## ETL
 

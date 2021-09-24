@@ -19,17 +19,17 @@ JOB_FLOW_OVERRIDES = {
         "InstanceGroups": [
             {
                 "Name": "Master node",
-                "Market": "SPOT",
+                "Market": "ON_DEMAND",
                 "InstanceRole": "MASTER",
                 "InstanceType": "m4.xlarge",
                 "InstanceCount": 1,
             },
             {
-                "Name": "Core - 2",
-                "Market": "SPOT",
+                "Name": "Core - 1",
+                "Market": "ON_DEMAND",
                 "InstanceRole": "CORE",
                 "InstanceType": "m4.xlarge",
-                "InstanceCount": 2,
+                "InstanceCount": 1,
             },
         ],
         "KeepJobFlowAliveWhenNoSteps": True,
@@ -37,6 +37,7 @@ JOB_FLOW_OVERRIDES = {
     },
     "JobFlowRole": "EMR_EC2_DefaultRole",
     "ServiceRole": "EMR_DefaultRole",
+    "VisibleToAllUsers": True
 }
 
 DATA_SOURCES_MAP = {

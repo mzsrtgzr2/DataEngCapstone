@@ -290,6 +290,47 @@ def _run_fact_activity(
     df_cov19_fact_activity_renames.write.parquet(
             os.path.join(output_loc, 'fact_activity'), mode='overwrite')
 
+def test_outputs(
+    df_activity,
+    df_countries,
+):
+    # make sure that our output data
+    # follows restrictions
+    
+    def _assert_unique(df, columns):
+        assert df.groupBy(columns).count().select(F.max('count')).first()[0] == 1
+
+    _assert_unique(df_activity, [
+        'date',
+        'continent',
+        'country',
+        'province'
+    ])
+
+    # also date+country+province should be unique
+    _assert_unique(df_activity, [
+        'date',
+        'country',
+        'province'
+    ])
+
+    _assert_unique(df_countries, [
+        'continent',
+        'country',
+        'province'
+    ])
+
+
+    def assert_never_null_column(df, column):
+        assert df.where(F.col(column).isNull()).count() == 0
+
+    assert_never_null_column(df_countries, 'continent')
+    assert_never_null_column(df_countries, 'country')
+
+    assert_never_null_column(df_activity, 'country')
+    assert_never_null_column(df_activity, 'date')
+
+
 def run(input_loc, output_loc):
     """
     This is a dummy function to show how to use spark, It is supposed to mock
@@ -319,6 +360,12 @@ def run(input_loc, output_loc):
         df_vacc_usa_doses,
         df_vacc_usa_people,
         output_loc)
+
+    # test
+    test_outputs(
+        df_activity,
+        df_countries,
+    )
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
