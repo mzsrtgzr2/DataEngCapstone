@@ -6,6 +6,7 @@ from helpers.task_group_emr_step import scaffold_emr_step
 from operators import UploadSourceOperator
 
 from settings import (
+    BUCKET_NAME,
     JOB_FLOW_OVERRIDES,
     DATA_SOURCES_MAP)
 
@@ -24,7 +25,6 @@ from airflow.contrib.operators.emr_terminate_job_flow_operator import (
 )
 
 # Configurations
-BUCKET_NAME = "udend-moshe-eb1b0d8"
 LOCAL_SCRIPTS_PATH = "./dags/scripts/spark"
 
 AWS_CONN_ID = 'aws_default'

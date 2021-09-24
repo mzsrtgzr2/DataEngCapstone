@@ -1,8 +1,10 @@
 
+BUCKET_NAME = "udend-moshe-eb1b0d8"
 
 JOB_FLOW_OVERRIDES = {
-    "Name": "COVID19-OPERATIONS",
-    "ReleaseLabel": "emr-5.29.0",
+    "Name": "JobCluster",
+    "ReleaseLabel": "emr-5.32.0",
+    "LogUri": f"s3://{BUCKET_NAME}/emr/",
     "Applications": [{"Name": "Hadoop"}, {"Name": "Spark"}],
     "Configurations": [
         {
@@ -16,20 +18,21 @@ JOB_FLOW_OVERRIDES = {
         }
     ],
     "Instances": {
+        "KeepJobFlowAliveWhenNoSteps": True,
         "InstanceGroups": [
             {
                 "Name": "Master node",
-                "Market": "ON_DEMAND",
+                "Market": "SPOT",
                 "InstanceRole": "MASTER",
                 "InstanceType": "m4.xlarge",
                 "InstanceCount": 1,
             },
             {
-                "Name": "Core - 1",
-                "Market": "ON_DEMAND",
+                "Name": "Core - 2",
+                "Market": "SPOT",
                 "InstanceRole": "CORE",
                 "InstanceType": "m4.xlarge",
-                "InstanceCount": 1,
+                "InstanceCount": 2,
             },
         ],
         "KeepJobFlowAliveWhenNoSteps": True,
@@ -37,7 +40,7 @@ JOB_FLOW_OVERRIDES = {
     },
     "JobFlowRole": "EMR_EC2_DefaultRole",
     "ServiceRole": "EMR_DefaultRole",
-    "VisibleToAllUsers": True
+    "VisibleToAllUsers": True,
 }
 
 DATA_SOURCES_MAP = {

@@ -243,5 +243,97 @@ There are several options:
 - Use Serverless Query engine like Athena.
 - Move to a dataware house.
 
+
+## Data quality check
+
+It's important to make test on the results because we are saving raw parquet and no database keeps any restrictions for us.
+
+### Unique Keys restriction
+Check that uniqueness of key columns is correct.
+
+- Fact-activity - check that date+country+province is unique
+- Dim-countries - check that continent+country+province is unique
+- Dim-continent - check that continent name is unique
+- Dim-data-source- -check that data source is unique
+- Dim-vaccination types - check that the names of the vaccinations types are unique
+
+### Null restrictions
+Check that some coulmns cannot be null
+
+- Fact-activity - date can't be null and country can't be null
+- Dim-countries - continent and country can't be null
+- Dim-continent - continent name can't be null
+- Dim-data-source- -data source can't be null
+- Dim-vaccination types - check that the names of the vaccinations types are not null
+
+
+## Sample Queries
+
+### Get the latest report on doses administration from Missisiippii
+```
+df_cov19_fact_activity_renames.filter(
+    (F.col('province') == 'Mississippi') & (F.col('doses_admin')>0)
+    ).orderBy(F.desc(F.col('date'))).select('date', 'doses_admin').head(1)
+```
+
+results:
+
+[Row(date='2021-09-19', doses_admin=**2703278**)]
+
+### What continent has the most positive cases of population?
+
+```
+df_cov19_fact_activity_renames.where("date='2021-09-19'").groupBy('continent').agg(
+    F.sum('people_positives_cases_count'),
+    F.sum('population')
+).withColumn('res',
+    F.col('sum(people_positives_cases_count)') / F.col('sum(population)')
+).orderBy(F.desc(F.col('res'))).show()
+```
+
+results:
+```
++---------+---------------------------------+---------------+--------------------+
+|continent|sum(people_positives_cases_count)|sum(population)|                 res|
++---------+---------------------------------+---------------+--------------------+
+|  America|                         88250856|  1.006353878E9| 0.08769366117551743|
+|   Europe|                         59060747|   7.65383598E8| 0.07716489764652626|
+|     Asia|                         72770282|  4.513214458E9|0.016123825419155385|
+|   Africa|                          8230674|  1.307475657E9|0.006295087756268643|
+|  Oceania|                           203451|    4.4253674E7|0.004597380999371939|
+|     null|                             1332|           null|                null|
++---------+---------------------------------+---------------+--------------------+
+```
+
+**The Continet with most positive cases is America with 8.76% infections**
+
+### What continent has the most vaccination precentage of population?
+
+```
+df_cov19_fact_activity_renames.where("date='2021-09-19'").groupBy('continent').agg(
+    F.sum('people_fully_vaccinated'),
+    F.sum('population')
+).withColumn('res',
+    F.col('sum(people_fully_vaccinated)') / F.col('sum(population)')
+).orderBy(F.desc(F.col('res'))).show()
+```
+
+results:
+```
++---------+----------------------------+---------------+-------------------+
+|continent|sum(people_fully_vaccinated)|sum(population)|                res|
++---------+----------------------------+---------------+-------------------+
+|   Europe|                   384128780|   7.65383598E8| 0.5018774651086787|
+|  America|                   399726989|  1.006353878E9| 0.3972032082734221|
+|     Asia|                   564053300|  4.513214458E9|0.12497817359424936|
+|  Oceania|                     2024326|    4.4253674E7|0.04574368220817101|
+|   Africa|                    50804099|  1.307475657E9|0.03885663088869271|
+|     null|                           0|           null|               null|
++---------+----------------------------+---------------+-------------------+
+```
+
+***The Continent with most fully vaccinated people is Europe with over 50% vaccinated population***
+
+
 ## Sources
 https://github.com/josephmachado/spark_submit_airflow
